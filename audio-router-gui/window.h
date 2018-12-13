@@ -6,6 +6,8 @@
 #include "licensing.h"
 #include <memory>
 #include <shellapi.h>
+//#pragma comment(lib,"mousehook.lib")
+//#include "..\mousehook\mousehook.h"
 
 #define WIN_WIDTH 970//400
 #define WIN_HEIGHT 670//360
@@ -16,6 +18,8 @@
 	{
 	private:
 		bool dlg_main_b;
+	protected:
+		//CmousehookApp m_hook;
 	public:
 		dialog_main* dlg_main;
 		formview* form_view;

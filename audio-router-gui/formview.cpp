@@ -38,8 +38,8 @@ formview::~formview()
         reset_all_devices(true);
 }
 
-input_dialog::input_dialog(int mode) : 
-    selected_index(-1), forced(true), mode(mode)
+input_dialog::input_dialog(int mode) :
+	selected_index(-1), forced(true), mode(mode)
 {
 }
 
