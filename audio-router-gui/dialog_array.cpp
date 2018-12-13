@@ -227,7 +227,7 @@ void dialog_array::set_volume(int level, bool set)
 
 void dialog_array::refresh_dialog_controls()
 {
-    this->clear_dialog_controls();
+    //this->clear_dialog_controls();
 
     //this->ctrl_group.SetWindowTextW(device_name.c_str());
 

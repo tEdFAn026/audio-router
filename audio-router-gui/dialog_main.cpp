@@ -15,18 +15,19 @@ dialog_main::~dialog_main()
 
 void dialog_main::clear_dialog_arrays()
 {
-    for(auto it = this->dialog_arrays.begin();
-        it != this->dialog_arrays.end();
-        it++)
-    {
-        delete *it;
-    }
-    this->dialog_arrays.clear();
+	for (auto it = this->dialog_arrays.begin();
+		it != this->dialog_arrays.end();
+		it++)
+	{
+		delete *it;
+	}
+	this->dialog_arrays.clear();
 }
 
-void dialog_main::refresh_dialog_arrays()
+void dialog_main::create_dialog_arrays()
 {
-    this->clear_dialog_arrays();
+    //this->clear_dialog_arrays();
+	this->dialog_arrays.clear();
 
     // set default array
     dialog_array* dlg_array = new dialog_array(*this);
@@ -52,6 +53,70 @@ void dialog_main::refresh_dialog_arrays()
     }
 
     this->reposition_dialog_arrays();
+}
+
+void dialog_main::refresh_dialog_arrays()
+{
+	app_inject backend;
+	backend.populate_devicelist();
+	app_inject::devices_t devices;
+	app_inject::get_devices(devices);
+	dialog_array* dlg_array;
+
+	//if (dialog_arrays.size() > (backend.device_names.size() + 1))
+	//{
+	//	for (size_t i = 0; i < dialog_arrays.size(); i++)
+	//	{
+	//		(*dialog_arrays[i]).DestroyWindow();
+	//	}
+	//	create_dialog_arrays();
+	//	return;
+	//}
+
+	for (size_t i = dialog_arrays.size() - 1;
+		i > backend.device_names.size();
+		i--)
+	{
+		(*dialog_arrays[i]).DestroyWindow();
+		dialog_arrays.pop_back();
+	}
+
+
+	(*dialog_arrays[0]).set_device(NULL, L"Default Audio Device");
+
+	for (size_t i = 0; i < backend.device_names.size(); i++)
+	{
+		if ((i + 1) < this->dialog_arrays.size())
+		{
+			(*dialog_arrays[i + 1]).set_device(devices[i], backend.device_names[i]);
+		}
+		else
+		{
+			dlg_array = new dialog_array(*this);
+			dlg_array->Create(this->m_hWnd);
+			dlg_array->set_device(devices[i], backend.device_names[i]);
+			dlg_array->refresh_dialog_controls();
+
+			this->dialog_arrays.push_back(dlg_array);
+		}
+	}
+
+	this->reposition_dialog_arrays();
+	}
+
+void dialog_main::delete_device(DWORD pid)
+{
+	for (dialog_arrays_t::iterator it = this->dialog_arrays.begin();
+		it != this->dialog_arrays.end();
+		it++)
+	{
+		if (it != this->dialog_arrays.end())
+		{
+			((*it)->find_control(pid))->DestroyWindow();
+			delete *it;
+			this->dialog_arrays.erase(it);
+		}
+	}
 }
 
 void dialog_main::reposition_dialog_arrays()
@@ -135,7 +200,7 @@ LRESULT dialog_main::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
         const_cast<int&>(spacing_y) = rc.top;
     }
 
-    this->refresh_dialog_arrays();
+    this->create_dialog_arrays();
     this->m_scrollHelper.AttachWnd(this);
 
     //// enable tab support
@@ -210,6 +275,12 @@ LRESULT dialog_main::OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 {
     if(this->parent.IsIconic())
         return 0;
+	app_inject backend;
+	backend.populate_devicelist();
+	if (dialog_arrays.size() != (backend.device_names.size() + 1))
+	{
+		refresh_dialog_arrays();
+	}
 
     for(dialog_arrays_t::iterator it = this->dialog_arrays.begin();
         it != this->dialog_arrays.end();

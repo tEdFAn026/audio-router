@@ -24,6 +24,7 @@ private:
 
     void clear_dialog_arrays();
 public:
+	
     const int spacing_x = 7, spacing_y = 7;
     dialog_arrays_t dialog_arrays;
     window& parent;
@@ -33,7 +34,9 @@ public:
     dialog_main(window&);
     ~dialog_main();
 
-    void refresh_dialog_arrays();
+    void create_dialog_arrays();
+	void refresh_dialog_arrays();
+	void delete_device(DWORD pid);
     void reposition_dialog_arrays();
     dialog_array* find_control(DWORD pid, dialog_control**, size_t index = 0);
 
