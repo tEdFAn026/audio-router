@@ -10,6 +10,7 @@
 
 CAppModule _Module;
 HANDLE audio_router_mutex;
+NOTIFYICONDATA nid;
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -127,17 +128,27 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         }
         win.ShowWindow(nCmdShow);
         win.UpdateWindow();
+		
+		nid.cbSize = (DWORD)sizeof(NOTIFYICONDATA);
+		nid.hWnd = win.m_hWnd;
+		nid.uID = IDR_MAINFRAME;
+		nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+		nid.uCallbackMessage = WM_SHOWTASK;//自定义的消息名称
+		nid.hIcon = LoadIcon(GetModuleHandle(NULL)/*AfxGetInstanceHandle()*/, MAKEINTRESOURCE(IDR_MAINFRAME));
+		//strcpy(nid.szTip, "程序名称"); //信息提示条
+		Shell_NotifyIcon(NIM_ADD, &nid); //在托盘区添加图标
 
         while(GetMessage(&msg, NULL, 0, 0) > 0)
         {
             if(win.dlg_main && IsDialogMessage(*win.dlg_main, &msg))
                 continue;
             TranslateMessage(&msg);
-            DispatchMessage(&msg);
+			DispatchMessage(&msg);
         }
     }
 
 cleanup:
+	Shell_NotifyIcon(NIM_DELETE, &nid);//图标删除
     Gdiplus::GdiplusShutdown(gdiplusToken);
     _Module.Term();
     CoUninitialize(); // this thread should be the last one to call uninitialize

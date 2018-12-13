@@ -18,6 +18,7 @@
 #define min(a,b)            (((a) < (b)) ? (a) : (b))
 #endif
 
+//#include <afxwin.h>
 #include "resource.h"
 #include <atlbase.h>
 #include <atlapp.h>
