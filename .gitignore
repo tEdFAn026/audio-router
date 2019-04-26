@@ -188,3 +188,4 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 /do/err.txt
+*.db
